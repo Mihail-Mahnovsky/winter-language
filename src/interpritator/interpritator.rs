@@ -12,14 +12,14 @@ use crate::numberNode;
 use crate::parser::nodes;
 
 pub struct Interpritator{
-    variables: HashMap<String, Object>,
+    stack : Vec<Object>,
 }
 
 impl Interpritator{
 
     pub fn new() -> Self{
         Self {     
-            variables: HashMap::new() 
+            stack: Vec::new()
         }
     }
 
@@ -41,7 +41,7 @@ impl Interpritator{
             Node::Assignment(assign) => {
                 let var_name = assign.get_variable().get_name();
                 let value = self.eval_expr(assign.get_expression());
-                self.variables.insert(var_name, value);
+                self.stack.push(value);
             }
             Node::ExpressionNode(expr) => {
                 let _ = self.eval_expr(expr);
@@ -59,9 +59,9 @@ impl Interpritator{
                 Object::String((str_node))
             }
             expressionNode::Variable(var_node) => {
-                let name = var_node.get_name();
-                self.variables.get(&name).cloned().unwrap_or_else(|| {
-                    panic!("variable : '{}' not have reasization", name)
+                let index = var_node.get_index();  
+                self.stack.get(index).cloned().unwrap_or_else(|| {
+                    panic!("var for index : {} exixts", index)
                 })
             }
             expressionNode::BinOp(boxed_op) => {
@@ -79,11 +79,11 @@ impl Interpritator{
                     },
                     (Object::String(l), Object::String(r)) => match op {
                         '+' => Object::String(l + &r),
-                        _ => panic!("eblan nelzia delet i misuc stroki!"),
+                        _ => panic!("nelzia plus, delet i misuc stroki!"),
                     },
                     (Object::String(l), Object::Int(r)) => match op {
                         '*' => Object::String(self.mulStr(l, r)),
-                        _ => panic!("eblan nelzia delet i misuc stroki!"),
+                        _ => panic!("nelzia delet i misuc stroki"),
                     },
                     _ => panic!("ia ne znayu che zdeci napicati"),
                 }

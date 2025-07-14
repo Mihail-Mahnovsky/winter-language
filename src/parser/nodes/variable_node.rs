@@ -1,17 +1,23 @@
 
 #[derive(Debug, Clone)]
 pub struct variableNode{
-    name : String
+    name : String,
+    index : usize
 }
 
 impl variableNode{
-    pub fn new(name : String) -> Self{
+    pub fn new(name : String, index : usize) -> Self{
         Self { 
-            name, 
+            name,
+            index 
         }
     }
 
     pub fn get_name(&self) -> String{
         return self.name.clone();
+    }
+
+    pub fn get_index(&self) -> usize {
+        self.index
     }
 }

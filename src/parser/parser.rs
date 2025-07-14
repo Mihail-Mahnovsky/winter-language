@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::assignmentNode;
 use crate::binOpNode;
 use crate::parser::nodes::{expressionNode, numberNode};
@@ -17,6 +19,8 @@ pub enum Node {
 pub struct Parser {
     tokens_clone: Vec<Token>,
     pos: usize,
+    variable_indices: HashMap<String, usize>,
+    next_index: usize,
 }
 
 impl Parser {
@@ -24,6 +28,8 @@ impl Parser {
         Self {
             tokens_clone: Vec::new(),
             pos: 0,
+            variable_indices : HashMap::new(),
+            next_index : 0,
         }
     }
 
@@ -54,17 +60,26 @@ impl Parser {
 
     fn assignment(&mut self) -> Node {
         let name = self.current().get_value();
-        //println!("Parsing assignment to variable: {}", name);
         self.eat(TokenType::ID);
         if self.current().get_type() == TokenType::Assignment {
             self.eat(TokenType::Assignment);
             let expr = self.expr();
-            let var_node = variableNode::new(name);
+
+            let index = if let Some(&idx) = self.variable_indices.get(&name) { idx } 
+            else {
+                let idx = self.next_index;
+                self.variable_indices.insert(name.clone(), idx);
+                self.next_index += 1;
+                idx
+            };
+
+            let var_node = variableNode::new(name, index);
             Node::Assignment(assignmentNode::new(var_node, expr))
         } else {
             panic!("Expected =");
         }
     }
+
 
     fn expr(&mut self) -> expressionNode {
         let left = self.term();
@@ -123,18 +138,16 @@ impl Parser {
             TokenType::ID => {
                 let name = self.current().get_value();
                 self.eat(TokenType::ID);
-                expressionNode::Variable(variableNode::new(name))
+                let index = if let Some(&idx) = self.variable_indices.get(&name) { idx } else {
+                    panic!("var '{}' not obivlena", name);
+                };
+                expressionNode::Variable(variableNode::new(name,index))
             },
             TokenType::LParen => {
                 self.eat(TokenType::LParen);
                 let expr = self.expr();
                 self.eat(TokenType::RParen);
                 expr
-            },
-            TokenType::ID => {
-                self.eat(TokenType::ID);
-                let name = tok.get_value();
-                expressionNode::Variable(variableNode::new(name))
             },
             _ => panic!("Unexpected token in factor(xyeta): {:?}", tok),
         }
