@@ -1,1 +1,3 @@
-x = 5+2
+x = 'hello'
+y = 'world'
+echo x + ' ' + y +'!'

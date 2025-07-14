@@ -1,7 +1,9 @@
 - microlang - is  easy programming language writen in rust for lesson  
 
-variable simple:
+program simple:
 
 ```mircolang
-let ver = 77
+x = 'hello'
+y = 'world'
+echo x + ' ' + y +'!'
 ```
