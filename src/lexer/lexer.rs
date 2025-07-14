@@ -97,6 +97,8 @@ impl Lexer {
             '=' => tokens.push(Token::new("=".to_string(), TokenType::Assignment)),
             '(' => tokens.push(Token::new("(".to_string(), TokenType::LParen)),
             ')' => tokens.push(Token::new(")".to_string(), TokenType::RParen)),
+            '{' => tokens.push(Token::new("{".to_string(), TokenType::LBracket)),
+            '}' => tokens.push(Token::new("}".to_string(), TokenType::RBracket)),
             ';' => tokens.push(Token::new(";".to_string(), TokenType::SEMICOLON)),
             ':' => tokens.push(Token::new(":".to_string(), TokenType::COLON)),
 

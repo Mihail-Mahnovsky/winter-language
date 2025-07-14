@@ -1,10 +1,12 @@
-use std::fmt;
+use std::{ffi::NulError, fmt::{self, write}};
 
 #[derive(Debug, Clone)]
 pub enum Object {
     Int(i32),
     Float(f32),
-    String(String)
+    String(String),
+    Bool(bool),
+    Void
 }
 
 impl Object {
@@ -32,7 +34,14 @@ impl Object {
             return None;
         }
     }
-    
+    pub fn as_bool(&self) -> Option<bool> {
+        if let Self::Bool(value) = self {
+            return Some(value.clone());
+        }
+        else {
+            return None;
+        }
+    }
 }
 
 impl fmt::Display for Object {
@@ -41,6 +50,8 @@ impl fmt::Display for Object {
             Object::Int(i) => write!(f, "{}", i),
             Object::Float(fl) => write!(f, "{}", fl),
             Object::String(s) => write!(f, "{}", s),
+            Object::Bool(s) => write!(f, "{}", s),
+            Object::Void => write!(f, "void"),
         }
     }
 }

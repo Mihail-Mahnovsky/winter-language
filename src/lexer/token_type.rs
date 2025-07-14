@@ -20,6 +20,9 @@ pub enum TokenType {
     //this echo add for test! in full version of language this token type need for deleting
     Echo,
 
+    LBracket,
+    RBracket,
+
     Assignment,
     COLON,
     SEMICOLON,
