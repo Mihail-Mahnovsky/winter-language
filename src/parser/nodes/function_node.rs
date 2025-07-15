@@ -1,25 +1,32 @@
-use std::result;
+use std::{result, string};
 
 use crate::interpritator::objects::Object;
 use crate::scopeNode;
+use crate::expressionNode;
 
 #[derive(Debug, Clone)]
 pub struct functionNode{
-    args : Vec<Object>,
+    name : String,
+    args : Vec<expressionNode>,
     scope : scopeNode,
     return_value : Object,
 }
 
 impl functionNode{
-    pub fn new(args : Vec<Object>,scope : scopeNode, return_value : Object) -> Self{
+    pub fn new(name : String, args : Vec<expressionNode>,scope : scopeNode, return_value : Object) -> Self{
         Self { 
+            name,
             args,
             scope,
             return_value, 
         }
     }
 
-    pub fn get_args(&self) -> Vec<Object>{
+    pub fn get_name(&self) -> String{
+        self.name.clone()
+    }
+
+    pub fn get_args(&self) -> Vec<expressionNode>{
         self.args.clone()
     }
 

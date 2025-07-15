@@ -16,14 +16,20 @@ fn main() {
     let mut par = Parser::new();
     let mut int = Interpritator::new();
 
-    for line in read_lines("examples/hello_world.txt") {
-        let tokens = lex.token_nize(line);
-        if !tokens.is_empty(){
-            let node = par.parse(tokens);
+    let mut code : String = String::new(); 
+
+    for line in read_lines("examples/hello_world.wn") {
+        code = format!("{}{}\n",code,line);
+    }
+
+
+    let tokens = lex.token_nize(code);
+    if !tokens.is_empty(){
+        let nodes = par.parse(tokens);
+        for node in nodes{
             int.execute(node);
         }
     }
-
 }
 
 fn read_lines(filename: &str) -> Vec<String> {

@@ -8,11 +8,21 @@ pub enum TokenType {
     IntLiteral,
     StringLiteral,
 
+    //lang words
     Fn,
     If,
     For,
     While,
+    Return,
+    Break,
+    Continue,
+
     ID,
+
+    IntType,
+    StringType,
+    FloatType,
+    BoolType,
 
     True,
     False,
@@ -26,4 +36,5 @@ pub enum TokenType {
     Assignment,
     COLON,
     SEMICOLON,
+    Coma,
 }

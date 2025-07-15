@@ -1,9 +1,9 @@
-- microlang - is  easy programming language writen in rust for lesson  
+- winter language - is  easy programming language writen in rust for lesson  
 
 program simple:
 
-```mircolang
-x = 'hello'
-y = 'world'
+```winter
+x : string = 'hello'
+y : string = 'world'
 echo x + ' ' + y +'!'
 ```

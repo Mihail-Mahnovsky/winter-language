@@ -10,6 +10,7 @@ use crate::parser::parser::Node;
 use crate::variableNode;
 use crate::numberNode;
 use crate::parser::nodes;
+use crate::parser::parser::Type;
 
 pub struct Interpritator{
     stack : Vec<Object>,
@@ -32,6 +33,18 @@ impl Interpritator{
         return res;
     }
 
+    fn type_matches(&mut self, var_type: &Type, val: &Object) -> bool {
+    match (var_type, val) {
+        (Type::Int, Object::Int(_)) => true,
+        (Type::Float, Object::Float(_)) => true,
+        (Type::String, Object::String(_)) => true,
+        (Type::Bool, Object::Bool(_)) => true,
+        (Type::Void, Object::Void) => true,
+        _ => false,
+        }
+    }
+
+
     pub fn execute(&mut self, node : Node) {
         match node {
             Node::EchoNode(echo) => {
@@ -39,18 +52,40 @@ impl Interpritator{
                 println!("{}", value);
             },
             Node::Assignment(assign) => {
-                let var_name = assign.get_variable().get_name();
                 let value = self.eval_expr(assign.get_expression());
-                self.stack.push(value);
+                let index = assign.get_variable().get_index();
+                if index < self.stack.len() {
+                if self.type_matches(&assign.get_variable().get_type(), &value) {
+                    self.stack[index] = value;
+                } else {
+                    panic!("Type mismatch: expected {:?}, got {:?}", assign.get_variable().get_type(), value);
+                }
+                    
+                } else {
+                    self.stack.resize(index + 1, Object::Void);
+                    self.stack[index] = value;
+                }
             }
             Node::ExpressionNode(expr) => {
                 let _ = self.eval_expr(expr);
+            },
+            Node::FunctionNode(func) => {
+                panic!("not function included")
             }
         }
     }
 
     fn eval_expr(&mut self, expr: expressionNode) -> Object {
         match expr {
+            expressionNode::DefaultValue(t) => {
+                match t {
+                Type::Int => Object::Int(0),
+                Type::String => Object::String(String::new()),
+                Type::Bool => Object::Bool(false),
+                Type::Float => Object::Float(0.0),
+                Type::Void => Object::Void,
+                }
+            }
             expressionNode::Number(num_node) => {
                 Object::Int((num_node.get_value()))
             }

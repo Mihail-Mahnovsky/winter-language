@@ -49,6 +49,9 @@ impl Lexer {
             "if"=>Token::new(res, TokenType::If),
             "true"=>Token::new(res, TokenType::True),
             "false"=>Token::new(res, TokenType::False),
+            "string"=>Token::new(res, TokenType::StringType),
+            "int"=>Token::new(res, TokenType::IntType),
+            "bool"=>Token::new(res, TokenType::BoolType),
             //for test
             "echo" => Token::new(res, TokenType::Echo),
             _ => Token::new(res, TokenType::ID),
@@ -89,7 +92,7 @@ impl Lexer {
 
     while self.pos < self.line_clone.len() {
         match self.current {
-            '#' => break,
+            '#' => continue,
             '+' => tokens.push(Token::new("+".to_string(), TokenType::Operator)),
             '-' => tokens.push(Token::new("-".to_string(), TokenType::Operator)),
             '*' => tokens.push(Token::new("*".to_string(), TokenType::Operator)),
@@ -101,6 +104,7 @@ impl Lexer {
             '}' => tokens.push(Token::new("}".to_string(), TokenType::RBracket)),
             ';' => tokens.push(Token::new(";".to_string(), TokenType::SEMICOLON)),
             ':' => tokens.push(Token::new(":".to_string(), TokenType::COLON)),
+            ',' => tokens.push(Token::new(",".to_string(), TokenType::Coma)),
 
 
             '"' | '\'' => {
@@ -132,7 +136,7 @@ impl Lexer {
 
 
         //for tok in &mut tokens{
-          //  println!("{}",tok.get_name_of_token());
+        //    println!("{}",tok.get_name_of_token());
         //}
 
         tokens

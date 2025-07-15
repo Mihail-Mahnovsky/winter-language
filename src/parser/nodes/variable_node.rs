@@ -1,15 +1,18 @@
+use crate::parser::parser::Type;
 
 #[derive(Debug, Clone)]
 pub struct variableNode{
     name : String,
-    index : usize
+    index : usize,
+    typeS : Type,
 }
 
 impl variableNode{
-    pub fn new(name : String, index : usize) -> Self{
+    pub fn new(name : String, index : usize,typeS : Type) -> Self{
         Self { 
             name,
-            index 
+            index, 
+            typeS,
         }
     }
 
@@ -19,5 +22,9 @@ impl variableNode{
 
     pub fn get_index(&self) -> usize {
         self.index
+    }
+
+    pub fn get_type(&self) -> Type{
+        self.typeS.clone()
     }
 }

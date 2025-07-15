@@ -1,0 +1,3 @@
+x : string = 'hello'
+y : string = 'world'
+echo x + ' ' + y +'!'

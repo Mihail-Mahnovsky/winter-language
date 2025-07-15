@@ -39,6 +39,7 @@ impl Token {
             TokenType::RParen => "RParen",
             TokenType::While => "while", 
             TokenType::Echo => "echo",
+            //TokenType::Type => self.get_value(),
             _ => return "error",
         }
     }
