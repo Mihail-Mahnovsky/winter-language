@@ -23,6 +23,7 @@ pub enum TokenType {
     StringType,
     FloatType,
     BoolType,
+    VoidType,
 
     True,
     False,

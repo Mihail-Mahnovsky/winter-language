@@ -1,3 +1,9 @@
-x : string = 'hello'
-y : string = 'world'
-echo x + ' ' + y +'!'
+h : int = 8
+
+fn test() : void {
+    gb : int = 5
+    echo gb
+    echo h
+}
+
+test()

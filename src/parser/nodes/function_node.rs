@@ -1,19 +1,19 @@
 use std::{result, string};
 
-use crate::interpritator::objects::Object;
+use crate::parser::parser::Arg;
 use crate::scopeNode;
 use crate::expressionNode;
 
 #[derive(Debug, Clone)]
 pub struct functionNode{
     name : String,
-    args : Vec<expressionNode>,
+    args : Vec<Arg>,
     scope : scopeNode,
-    return_value : Object,
+    return_value : expressionNode,
 }
 
 impl functionNode{
-    pub fn new(name : String, args : Vec<expressionNode>,scope : scopeNode, return_value : Object) -> Self{
+    pub fn new(name : String, args : Vec<Arg>,scope : scopeNode, return_value : expressionNode) -> Self{
         Self { 
             name,
             args,
@@ -26,7 +26,7 @@ impl functionNode{
         self.name.clone()
     }
 
-    pub fn get_args(&self) -> Vec<expressionNode>{
+    pub fn get_args(&self) -> Vec<Arg>{
         self.args.clone()
     }
 
@@ -34,7 +34,7 @@ impl functionNode{
         self.scope.clone()
     } 
 
-    pub fn get_ret_val(&self) -> Object{
-        self.get_ret_val().clone()
+    pub fn get_ret_val(&self) -> expressionNode{
+        self.return_value.clone()
     }
 }

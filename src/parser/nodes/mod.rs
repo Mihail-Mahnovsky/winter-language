@@ -6,6 +6,7 @@ pub mod expression_node;
 pub mod echo_node;
 pub mod scope_node;
 pub mod function_node;
+pub mod call_node;
 
 pub use number_node::numberNode;
 pub use bin_op_node::binOpNode;
@@ -15,3 +16,4 @@ pub use expression_node::expressionNode;
 pub use echo_node::echoNode;
 pub use scope_node::scopeNode;
 pub use function_node::functionNode;
+pub use call_node::callNode;

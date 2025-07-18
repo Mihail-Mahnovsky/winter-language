@@ -52,6 +52,7 @@ impl Lexer {
             "string"=>Token::new(res, TokenType::StringType),
             "int"=>Token::new(res, TokenType::IntType),
             "bool"=>Token::new(res, TokenType::BoolType),
+            "void"=>Token::new(res, TokenType::VoidType),
             //for test
             "echo" => Token::new(res, TokenType::Echo),
             _ => Token::new(res, TokenType::ID),
