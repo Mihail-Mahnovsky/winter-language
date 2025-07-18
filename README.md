@@ -3,7 +3,9 @@
 program simple:
 
 ```winter
-x : string = 'hello'
-y : string = 'world'
-echo x + ' ' + y +'!'
+fn hello() : void{
+    echo 'hello, world!'
+}
+
+hello()
 ```

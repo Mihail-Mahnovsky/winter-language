@@ -1,9 +1,5 @@
-h : int = 8
-
-fn test() : void {
-    gb : int = 5
-    echo gb
-    echo h
+fn hello() : void{
+    echo 'hello, world!'
 }
 
-test()
+hello()
