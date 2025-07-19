@@ -28,7 +28,7 @@ pub enum Type {
     Void,
 }
 
-#[derive(Debug, Clone)]  
+#[derive(Debug, Clone)]
 pub struct Arg {
     pub name: String,
     pub arg_type: Type,
@@ -45,9 +45,7 @@ pub enum Node {
 pub struct Parser {
     tokens_clone: Vec<Token>,
     pos: usize,
-    variable_indices: HashMap<String, usize>,
     variable_types: HashMap<String, Type>,
-    next_index: usize,
 }
 
 impl Parser {
@@ -55,9 +53,7 @@ impl Parser {
         Self {
             tokens_clone: Vec::new(),
             pos: 0,
-            variable_indices: HashMap::new(),
             variable_types: HashMap::new(),
-            next_index: 0,
         }
     }
 
@@ -118,7 +114,7 @@ impl Parser {
                             break;
                         }
                     }
-                    self.eat(TokenType::RParen); 
+                    self.eat(TokenType::RParen);
                     Node::ExpressionNode(
                         (expressionNode::FunctionCall((callNode::new(name, args)))),
                     )
@@ -136,17 +132,6 @@ impl Parser {
         }
     }
 
-    fn allocate_variable(&mut self, name: String) -> usize {
-        if let Some(&idx) = self.variable_indices.get(&name) {
-            idx
-        } else {
-            let idx = self.next_index;
-            self.variable_indices.insert(name, idx);
-            self.next_index += 1;
-            idx
-        }
-    }
-
     fn reassignment(&mut self) -> Node {
         let name = self.current().get_value();
         self.eat(TokenType::ID);
@@ -160,7 +145,7 @@ impl Parser {
             .unwrap_or_else(|| panic!("no type found for variable '{}'", name))
             .clone();
 
-        let var_node = variableNode::new(name,t);
+        let var_node = variableNode::new(name, t);
         Node::Assignment(assignmentNode::new(var_node, expr))
     }
 
@@ -175,10 +160,6 @@ impl Parser {
             TokenType::BoolType => Type::Bool,
             _ => panic!("Unexpected type"),
         };
-
-        if self.variable_indices.contains_key(&name) {
-            panic!("Variable '{}' already declared", name);
-        }
 
         self.variable_types.insert(name.clone(), t.clone());
         self.eat(self.current().get_type());
@@ -214,11 +195,9 @@ impl Parser {
                 panic!("Type not need {:?}, got {:?}", t, expr);
             }
 
-            let index = self.allocate_variable(name.clone());
-            return Node::Assignment(assignmentNode::new(variableNode::new(name,t), expr));
+            return Node::Assignment(assignmentNode::new(variableNode::new(name, t), expr));
         }
 
-        let index = self.allocate_variable(name.clone());
         Node::Assignment(assignmentNode::new(
             variableNode::new(name, t.clone()),
             expressionNode::DefaultValue(t),
@@ -275,8 +254,6 @@ impl Parser {
                     _ => panic!("unknown arg type"),
                 };
 
-
-
                 args.push(Arg {
                     name: arg_name,
                     arg_type,
@@ -293,6 +270,11 @@ impl Parser {
         }
 
         self.eat(TokenType::RParen);
+        for arg in &args {
+            //println!("arg : {}",arg.name);
+            self.variable_types
+                .insert(arg.name.clone(), arg.arg_type.clone());
+        }
 
         self.eat(TokenType::COLON);
 
@@ -391,7 +373,8 @@ impl Parser {
             TokenType::ID => {
                 let name = self.current().get_value();
 
-                if self.tokens_clone.get(self.pos + 1).map(|t| t.get_type()) == Some(TokenType::LParen)
+                if self.tokens_clone.get(self.pos + 1).map(|t| t.get_type())
+                    == Some(TokenType::LParen)
                 {
                     self.eat(TokenType::ID);
                     self.eat(TokenType::LParen);
@@ -421,7 +404,7 @@ impl Parser {
                         .unwrap_or_else(|| panic!("var '{}' not obivlena", name))
                         .clone();
 
-                    expressionNode::Variable(variableNode::new(name,var_type))
+                    expressionNode::Variable(variableNode::new(name, var_type))
                 }
             }
             TokenType::LParen => {

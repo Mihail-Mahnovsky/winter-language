@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::f32::consts::E;
+use std::thread::scope;
 
 use crate::assignmentNode;
 use crate::binOpNode;
@@ -9,6 +11,8 @@ use crate::interpritator::objects::*;
 use crate::numberNode;
 use crate::parser::nodes;
 use crate::parser::nodes::expressionNode;
+use crate::parser::nodes::scopeNode;
+use crate::parser::parser::Arg;
 use crate::parser::parser::Node;
 use crate::parser::parser::Type;
 use crate::variableNode;
@@ -72,14 +76,12 @@ impl Interpritator {
         }
     }
 
-    fn get_clone_node(&self, c_fn: &function) -> Vec<Node> {
-        let mut nodess: Vec<Node> = Vec::new();
-        for i in 0..c_fn.get_scope().get_nodes_len() {
-            if let Some(no) = c_fn.get_scope().get_nodes().get(i) {
-                nodess.push(no.clone());
-            }
+    fn get_clone_node(&self, scope: &scopeNode) -> Vec<Node> {
+        let mut nodes: Vec<Node> = Vec::new();
+        for node in scope.get_nodes() {
+            nodes.push(node.clone());
         }
-        nodess
+        nodes
     }
 
     fn eval_expr(&mut self, expr: expressionNode) -> Object {
@@ -99,7 +101,7 @@ impl Interpritator {
                 self.variables
                     .get(&name)
                     .cloned()
-                    .unwrap_or_else(|| panic!("Переменная '{}' не определена", name))
+                    .unwrap_or_else(|| panic!("var '{}' not exits", name))
             }
             expressionNode::BinOp(boxed_op) => {
                 let left: Object = self.eval_expr(boxed_op.get_left());
@@ -134,13 +136,89 @@ impl Interpritator {
                 let name = call.get_function_name();
                 let args = call.get_arguments();
 
-                if let Some(c_fn) = self.functions.get(&name) {
-                    let nodes = { self.get_clone_node(c_fn) };
-                    for node in nodes.iter() {
-                        self.execute(node.clone());
-                    }
+                let mut evaled_args = Vec::new();
+
+                for arg in &args {
+                    evaled_args.push(self.eval_expr(arg.clone()));
                 }
 
+                if let Some(c_fn) = self.functions.get_mut(&name) {
+                    let f_args = c_fn.get_args().clone();
+                    let scope = c_fn.get_scope_mut();
+
+                    for (i, value) in evaled_args.iter().enumerate() {
+                        match &args[i] {
+                            expressionNode::StringLiteral(_) => {
+                                if f_args[i].arg_type == Type::String {
+                                    let name = f_args[i].name.clone();
+                                    scope.add_variable(
+                                        name,
+                                        Object::String(value.as_string().unwrap().clone()),
+                                    );
+                                } else {
+                                    panic!("error with types");
+                                }
+                            }
+                            expressionNode::Number(_) => {
+                                if f_args[i].arg_type == Type::Int {
+                                    let name = f_args[i].name.clone();
+                                    scope.add_variable(
+                                        name,
+                                        Object::Int(value.as_int().unwrap().clone()),
+                                    );
+                                } else if f_args[i].arg_type == Type::Float {
+                                    let name = f_args[i].name.clone();
+                                    scope.add_variable(
+                                        name,
+                                        Object::Float(value.as_float().unwrap().clone()),
+                                    );
+                                } else {
+                                    panic!("error with types");
+                                }
+                            }
+                            expressionNode::BinOp(_) => {
+                                let name = f_args[i].name.clone();
+
+                                match &value {
+                                    Object::Int(v) => {
+                                        if f_args[i].arg_type != Type::Int {
+                                            panic!(
+                                                "type mismatch: expected {:?}, got Int",
+                                                f_args[i].arg_type
+                                            );
+                                        }
+                                        scope.add_variable(name, Object::Int(*v));
+                                    }
+
+                                    Object::String(s) => {
+                                        if f_args[i].arg_type != Type::String {
+                                            panic!(
+                                                "type mismatch: expected {:?}, got String",
+                                                f_args[i].arg_type
+                                            );
+                                        }
+                                        scope.add_variable(name, Object::String(s.clone()));
+                                    }
+
+                                    _ => panic!(
+                                        "BinOp result must be Int or String, got {:?}",
+                                        value
+                                    ),
+                                }
+                            }
+
+                            _ => panic!("govvvmo"),
+                        }
+                    }
+                    let scope_nodes = scope.get_nodes().clone();
+
+                    let temp: HashMap<String, Object> = self.variables.clone();
+                    self.variables = c_fn.get_scope().get_variables();
+                    for node in scope_nodes {
+                        self.execute(node);
+                    }
+                    self.variables = temp;
+                }
                 return Object::Void;
             }
         }

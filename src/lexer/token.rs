@@ -22,8 +22,8 @@ impl Token {
         self.tok_value.clone()
     }
 
-    pub fn get_name_of_token(&self) -> &str{
-        match  self.tok_type{
+    pub fn get_name_of_token(&self) -> &str {
+        match self.tok_type {
             TokenType::Operator => "operator",
             TokenType::IntLiteral => "int_literal",
             TokenType::Assignment => "assignment",
@@ -37,7 +37,7 @@ impl Token {
             TokenType::If => "if",
             TokenType::LParen => "LParen",
             TokenType::RParen => "RParen",
-            TokenType::While => "while", 
+            TokenType::While => "while",
             TokenType::Echo => "echo",
             //TokenType::Type => self.get_value(),
             _ => return "error",

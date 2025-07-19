@@ -1,32 +1,31 @@
+mod interpritator;
 mod lexer;
 mod parser;
-mod interpritator;
 
 use std::fs::read_to_string;
 
 use crate::interpritator::interpritator::Interpritator;
+use crate::interpritator::objects::Object;
 use crate::lexer::lexer::Lexer;
 use crate::lexer::token;
 use crate::parser::nodes::*;
 use crate::parser::parser::Parser;
-use crate::interpritator::objects::Object;
 
 fn main() {
     let mut lex = Lexer::new();
     let mut par = Parser::new();
     let mut int = Interpritator::new();
 
-    let mut code : String = String::new(); 
+    let mut code: String = String::new();
 
     for line in read_lines("examples/hello_world.wn") {
-        code = format!("{}{}\n",code,line);
+        code = format!("{}{}\n", code, line);
     }
 
-
     let tokens = lex.token_nize(code);
-    if !tokens.is_empty(){
+    if !tokens.is_empty() {
         let nodes = par.parse(tokens);
-        for node in nodes{
+        for node in nodes {
             int.execute(node);
         }
     }

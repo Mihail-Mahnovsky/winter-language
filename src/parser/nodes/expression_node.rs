@@ -1,8 +1,8 @@
-use crate::number_node::numberNode;
-use crate::variable_node::variableNode;
 use crate::bin_op_node::binOpNode;
-use crate::parser::parser::Type;
 use crate::callNode;
+use crate::number_node::numberNode;
+use crate::parser::parser::Type;
+use crate::variable_node::variableNode;
 
 #[derive(Debug, Clone)]
 pub enum expressionNode {

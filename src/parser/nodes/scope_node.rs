@@ -1,5 +1,5 @@
-use crate::parser::parser::Node;
 use crate::interpritator::objects::Object;
+use crate::parser::parser::Node;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -20,14 +20,19 @@ impl scopeNode {
         self.nodes.clone()
     }
 
-    pub fn get_nodes_len(&self) -> usize {
+    pub fn get_variables(&self) -> HashMap<String, Object> {
+        self.variables.clone()
+    }
+
+    pub fn get_nodes_len(&mut self) -> usize {
         self.nodes.len()
     }
 
     pub fn get_variable(&self, name_of_var: String) -> Object {
-        self.variables.get(&name_of_var).cloned().unwrap_or_else(|| {
-            panic!("var '{}' not not obl", name_of_var)
-        })
+        self.variables
+            .get(&name_of_var)
+            .cloned()
+            .unwrap_or_else(|| panic!("var '{}' not not obl", name_of_var))
     }
 
     pub fn add_variable(&mut self, name: String, obj: Object) {

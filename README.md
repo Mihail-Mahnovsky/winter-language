@@ -3,9 +3,9 @@
 program simple:
 
 ```winter
-fn hello() : void{
-    echo 'hello, world!'
+fn print(str1 : string,str2 : string) : void{
+    echo str1 + str2
 }
 
-hello()
+print('hello' + ',',' world' + '!')
 ```

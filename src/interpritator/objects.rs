@@ -1,4 +1,7 @@
-use std::{ffi::NulError, fmt::{self, write}};
+use std::{
+    ffi::NulError,
+    fmt::{self, write},
+};
 
 #[derive(Debug, Clone)]
 pub enum Object {
@@ -6,39 +9,35 @@ pub enum Object {
     Float(f32),
     String(String),
     Bool(bool),
-    Void
+    Void,
 }
 
 impl Object {
     pub fn as_int(&self) -> Option<i32> {
         if let Self::Int(value) = *self {
             return Some(value);
-        }
-        else {
+        } else {
             return None;
         }
     }
     pub fn as_float(&self) -> Option<f32> {
         if let Self::Float(value) = *self {
             return Some(value);
-        }
-        else {
+        } else {
             return None;
         }
     }
     pub fn as_string(&self) -> Option<String> {
         if let Self::String(value) = self {
             return Some(value.clone());
-        }
-        else {
+        } else {
             return None;
         }
     }
     pub fn as_bool(&self) -> Option<bool> {
         if let Self::Bool(value) = self {
             return Some(value.clone());
-        }
-        else {
+        } else {
             return None;
         }
     }
