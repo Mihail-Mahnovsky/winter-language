@@ -7,7 +7,6 @@ use std::vec;
 
 use crate::assignmentNode;
 use crate::binOpNode;
-use crate::echoNode;
 use crate::functionNode;
 use crate::interpritator::objects::Object;
 use crate::lexer;
@@ -39,7 +38,6 @@ pub struct Arg {
 pub enum Node {
     Assignment(assignmentNode),
     ExpressionNode(expressionNode),
-    EchoNode(echoNode),
     FunctionNode(functionNode),
     ReturnNode(returnNode),
 }
@@ -124,11 +122,6 @@ impl Parser {
                     panic!("Invalid statement starting with ID");
                 }
             }
-            TokenType::Echo => {
-                self.eat(TokenType::Echo);
-                let expr: expressionNode = self.expr();
-                Node::EchoNode(echoNode::new(expr))
-            }
             TokenType::Fn => self.custom_func(),
             TokenType::Return => {
                 self.eat(TokenType::Return);
@@ -198,9 +191,9 @@ impl Parser {
                 _ => false,
             };
 
-            if !extype {
-                panic!("Type not need {:?}, got {:?}", t, expr);
-            }
+            //if !extype {
+                //panic!("Type not need {:?}, got {:?}", t, expr);
+            //}
 
             return Node::Assignment(assignmentNode::new(variableNode::new(name, t), expr));
         }

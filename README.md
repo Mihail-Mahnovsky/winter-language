@@ -1,11 +1,25 @@
 - winter language - is  easy programming language writen in rust for lesson  
 
-program simple:
+hello world program simple:
 
 ```winter
-fn print(str1 : string,str2 : string) : string{
-    return str1 + str2
+println("hello, world!")
+```
+
+functions simple:
+
+```winter
+fn t() : string{
+    return scan()
 }
 
-echo print('hello' + ',',' world' + '!')
+fn h() : string{
+    return "hello "
+}
+fn test() : string{
+    return h() + t()
+}
+
+println("whats your name?")
+println(test())
 ```

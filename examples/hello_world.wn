@@ -1,5 +1,1 @@
-fn print(str1 : string,str2 : string) : string{
-    return str1 + str2
-}
-
-echo print('hello' + ',',' world' + '!')
+println("hello, world!")

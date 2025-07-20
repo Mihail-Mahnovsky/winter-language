@@ -1,7 +1,6 @@
 pub mod assignment_node;
 pub mod bin_op_node;
 pub mod call_node;
-pub mod echo_node;
 pub mod expression_node;
 pub mod function_node;
 pub mod number_node;
@@ -12,7 +11,6 @@ pub mod variable_node;
 pub use assignment_node::assignmentNode;
 pub use bin_op_node::binOpNode;
 pub use call_node::callNode;
-pub use echo_node::echoNode;
 pub use expression_node::expressionNode;
 pub use function_node::functionNode;
 pub use number_node::numberNode;

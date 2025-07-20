@@ -1,5 +1,13 @@
-fn test(gg : int) : void{
-    return gg
+fn t() : string{
+    return scan()
 }
 
-echo test(8)
+fn h() : string{
+    return "hello "
+}
+fn test() : string{
+    return h() + t()
+}
+
+println("whats your name?")
+println(test())

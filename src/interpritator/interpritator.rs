@@ -4,10 +4,11 @@ use std::thread::scope;
 
 use crate::assignmentNode;
 use crate::binOpNode;
-use crate::echoNode;
 use crate::expression_node;
 use crate::interpritator::function::*;
 use crate::interpritator::objects::*;
+use crate::interpritator::systemFunctions;
+use crate::interpritator::systemFunctions::*;
 use crate::numberNode;
 use crate::parser::nodes;
 use crate::parser::nodes::expressionNode;
@@ -59,11 +60,6 @@ impl Interpritator {
 
     pub fn execute(&mut self, node: Node) -> State {
         match node {
-            Node::EchoNode(echo) => {
-                let value = self.eval_expr(echo.value);
-                println!("{}", value);
-                State::Continue
-            }
             Node::Assignment(assign) => {
                 let value = self.eval_expr(assign.get_expression());
                 let name = assign.get_variable().get_name();
@@ -148,6 +144,29 @@ impl Interpritator {
             }
             expressionNode::FunctionCall(call) => {
                 let name = call.get_function_name();
+
+                if name == "println" {
+                    let mut args_for_println: Vec<Object> = Vec::new();
+                    for arg in call.get_arguments() {
+                        args_for_println.push(self.eval_expr(arg));
+                    }
+                    systemFunctions::println(args_for_println);
+                    return Object::Void;
+                }
+
+                if name == "print" {
+                    let mut args_for_println: Vec<Object> = Vec::new();
+                    for arg in call.get_arguments() {
+                        args_for_println.push(self.eval_expr(arg));
+                    }
+                    systemFunctions::print(args_for_println);
+                    return Object::Void;
+                }
+
+                if name == "scan" {
+                    return systemFunctions::scan();
+                }
+
                 let args = call.get_arguments();
 
                 let mut evaled_args = Vec::new();
