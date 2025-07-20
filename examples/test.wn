@@ -1,0 +1,5 @@
+fn test(gg : int) : void{
+    return gg
+}
+
+echo test(8)

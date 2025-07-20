@@ -13,6 +13,7 @@ use crate::interpritator::objects::Object;
 use crate::lexer;
 use crate::parser::nodes::callNode;
 use crate::parser::nodes::{expressionNode, numberNode};
+use crate::returnNode;
 use crate::scopeNode;
 use crate::variableNode;
 
@@ -40,6 +41,7 @@ pub enum Node {
     ExpressionNode(expressionNode),
     EchoNode(echoNode),
     FunctionNode(functionNode),
+    ReturnNode(returnNode),
 }
 
 pub struct Parser {
@@ -128,6 +130,11 @@ impl Parser {
                 Node::EchoNode(echoNode::new(expr))
             }
             TokenType::Fn => self.custom_func(),
+            TokenType::Return => {
+                self.eat(TokenType::Return);
+                let value = self.expr();
+                Node::ReturnNode((returnNode::new(value)))
+            }
             _ => Node::ExpressionNode(self.expr()),
         }
     }
@@ -282,19 +289,19 @@ impl Parser {
         let return_val = match self.current().get_type() {
             TokenType::IntType => {
                 self.eat(TokenType::IntType);
-                expressionNode::DefaultValue(Type::Int)
+                Type::Int
             }
             TokenType::StringType => {
                 self.eat(TokenType::StringType);
-                expressionNode::DefaultValue(Type::String)
+                Type::String
             }
             TokenType::BoolType => {
                 self.eat(TokenType::BoolType);
-                expressionNode::DefaultValue(Type::Bool)
+                Type::Bool
             }
             TokenType::VoidType => {
                 self.eat(TokenType::VoidType);
-                expressionNode::DefaultValue(Type::Void)
+                Type::Void
             }
             _ => panic!("Unknown return type: {}", self.current().get_value()),
         };

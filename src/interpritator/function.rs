@@ -1,5 +1,5 @@
 use crate::expressionNode;
-use crate::parser::parser::Arg;
+use crate::parser::parser::{Arg, Type};
 use crate::scopeNode;
 
 #[derive(Debug, Clone)]
@@ -7,11 +7,11 @@ pub struct function {
     name: String,
     scope: scopeNode,
     args: Vec<Arg>,
-    return_val: expressionNode,
+    return_val: Type,
 }
 
 impl function {
-    pub fn new(name: String, scope: scopeNode, args: Vec<Arg>, return_val: expressionNode) -> Self {
+    pub fn new(name: String, scope: scopeNode, args: Vec<Arg>, return_val: Type) -> Self {
         Self {
             name,
             scope,
@@ -36,7 +36,7 @@ impl function {
         self.args.clone()
     }
 
-    pub fn get_return_value(&self) -> expressionNode {
+    pub fn get_return_value(&self) -> Type {
         self.return_val.clone()
     }
 }

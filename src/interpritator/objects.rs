@@ -3,6 +3,8 @@ use std::{
     fmt::{self, write},
 };
 
+use crate::parser::parser::Type;
+
 #[derive(Debug, Clone)]
 pub enum Object {
     Int(i32),
@@ -13,6 +15,16 @@ pub enum Object {
 }
 
 impl Object {
+    pub fn get_type(&self) -> Type {
+        match self {
+            Object::Int(_) => Type::Int,
+            Object::Float(_) => Type::Float,
+            Object::String(_) => Type::String,
+            Object::Bool(_) => Type::Bool,
+            Object::Void => Type::Void,
+        }
+    }
+
     pub fn as_int(&self) -> Option<i32> {
         if let Self::Int(value) = *self {
             return Some(value);

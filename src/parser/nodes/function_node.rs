@@ -1,7 +1,7 @@
 use std::{result, string};
 
 use crate::expressionNode;
-use crate::parser::parser::Arg;
+use crate::parser::parser::{Arg, Type};
 use crate::scopeNode;
 
 #[derive(Debug, Clone)]
@@ -9,16 +9,11 @@ pub struct functionNode {
     name: String,
     args: Vec<Arg>,
     scope: scopeNode,
-    return_value: expressionNode,
+    return_value: Type,
 }
 
 impl functionNode {
-    pub fn new(
-        name: String,
-        args: Vec<Arg>,
-        scope: scopeNode,
-        return_value: expressionNode,
-    ) -> Self {
+    pub fn new(name: String, args: Vec<Arg>, scope: scopeNode, return_value: Type) -> Self {
         Self {
             name,
             args,
@@ -39,7 +34,7 @@ impl functionNode {
         self.scope.clone()
     }
 
-    pub fn get_ret_val(&self) -> expressionNode {
+    pub fn get_ret_val(&self) -> Type {
         self.return_value.clone()
     }
 }

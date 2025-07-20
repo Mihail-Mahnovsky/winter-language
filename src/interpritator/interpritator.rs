@@ -18,6 +18,12 @@ use crate::parser::parser::Type;
 use crate::variableNode;
 
 #[derive(Debug, Clone)]
+pub enum State {
+    Continue,
+    Return(Object),
+}
+
+#[derive(Debug, Clone)]
 pub struct Interpritator {
     variables: HashMap<String, Object>,
     functions: HashMap<String, function>,
@@ -51,19 +57,22 @@ impl Interpritator {
         }
     }
 
-    pub fn execute(&mut self, node: Node) {
+    pub fn execute(&mut self, node: Node) -> State {
         match node {
             Node::EchoNode(echo) => {
                 let value = self.eval_expr(echo.value);
                 println!("{}", value);
+                State::Continue
             }
             Node::Assignment(assign) => {
                 let value = self.eval_expr(assign.get_expression());
                 let name = assign.get_variable().get_name();
                 self.variables.insert(name, value);
+                State::Continue
             }
             Node::ExpressionNode(expr) => {
                 let _ = self.eval_expr(expr);
+                State::Continue
             }
             Node::FunctionNode(func) => {
                 let name = func.get_name();
@@ -72,6 +81,11 @@ impl Interpritator {
                 let ret_val = func.get_ret_val();
                 self.functions
                     .insert(name.clone(), function::new(name, scope, args, ret_val));
+                State::Continue
+            }
+            Node::ReturnNode(ret_node) => {
+                let value = self.eval_expr(ret_node.get_return_value());
+                State::Return((value))
             }
         }
     }
@@ -141,10 +155,11 @@ impl Interpritator {
                 for arg in &args {
                     evaled_args.push(self.eval_expr(arg.clone()));
                 }
+                let temp = self.variables.clone();
 
-                if let Some(c_fn) = self.functions.get_mut(&name) {
+                let scope_nodes = if let Some(c_fn) = self.functions.get(&name) {
                     let f_args = c_fn.get_args().clone();
-                    let scope = c_fn.get_scope_mut();
+                    let scope = c_fn.get_scope();
 
                     for (i, value) in evaled_args.iter().enumerate() {
                         match &args[i] {
@@ -206,18 +221,89 @@ impl Interpritator {
                                     ),
                                 }
                             }
+                            expressionNode::Variable(var) => {
+                                if f_args[i].arg_type == var.get_type() {
+                                    let name = f_args[i].name.clone();
+
+                                    match var.get_type() {
+                                        Type::Int => {
+                                            scope.add_variable(
+                                                name,
+                                                Object::Int(
+                                                    value.as_int().expect("need Int value"),
+                                                ),
+                                            );
+                                        }
+                                        Type::String => {
+                                            scope.add_variable(
+                                                name,
+                                                Object::String(
+                                                    value.as_string().expect("need String value"),
+                                                ),
+                                            );
+                                        }
+                                        Type::Bool => {
+                                            scope.add_variable(
+                                                name,
+                                                Object::Bool(
+                                                    value.as_bool().expect("need Bool value"),
+                                                ),
+                                            );
+                                        }
+                                        Type::Float => {
+                                            scope.add_variable(
+                                                name,
+                                                Object::Float(
+                                                    value.as_float().expect("need Float value"),
+                                                ),
+                                            );
+                                        }
+                                        Type::Void => {
+                                            panic!("Cannot assign variable of type Void");
+                                        }
+                                    }
+                                } else {
+                                    panic!(
+                                        "Type mismatch in function argument '{}': expected {:?}, got {:?}",
+                                        f_args[i].name,
+                                        f_args[i].arg_type,
+                                        var.get_type()
+                                    );
+                                }
+                            }
 
                             _ => panic!("govvvmo"),
                         }
                     }
-                    let scope_nodes = scope.get_nodes().clone();
 
-                    let temp: HashMap<String, Object> = self.variables.clone();
-                    self.variables = c_fn.get_scope().get_variables();
+                    self.variables = scope.get_variables();
+                    Some(scope.get_nodes().clone())
+                } else {
+                    None
+                };
+
+                if let Some(scope_nodes) = scope_nodes {
+                    let mut return_value = Object::Void;
+
                     for node in scope_nodes {
-                        self.execute(node);
+                        match self.execute(node) {
+                            State::Continue => continue,
+                            State::Return(value) => {
+                                return_value = value;
+                                break;
+                            }
+                        }
                     }
+
                     self.variables = temp;
+
+                    if let Some(c_fn) = self.functions.get(&name) {
+                        if return_value.get_type() == c_fn.get_return_value() {
+                            return return_value;
+                        } else {
+                            panic!("func return")
+                        }
+                    }
                 }
                 return Object::Void;
             }

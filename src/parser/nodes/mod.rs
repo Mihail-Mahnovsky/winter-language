@@ -5,6 +5,7 @@ pub mod echo_node;
 pub mod expression_node;
 pub mod function_node;
 pub mod number_node;
+pub mod return_node;
 pub mod scope_node;
 pub mod variable_node;
 
@@ -15,5 +16,6 @@ pub use echo_node::echoNode;
 pub use expression_node::expressionNode;
 pub use function_node::functionNode;
 pub use number_node::numberNode;
+pub use return_node::returnNode;
 pub use scope_node::scopeNode;
 pub use variable_node::variableNode;
