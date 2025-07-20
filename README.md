@@ -3,9 +3,9 @@
 program simple:
 
 ```winter
-fn print(str1 : string,str2 : string) : void{
-    echo str1 + str2
+fn print(str1 : string,str2 : string) : string{
+    return str1 + str2
 }
 
-print('hello' + ',',' world' + '!')
+echo print('hello' + ',',' world' + '!')
 ```
