@@ -18,7 +18,7 @@ fn main() {
 
     let mut code: String = String::new();
 
-    for line in read_lines("examples/test.wn") {
+    for line in read_lines("examples/hello_world.wn") {
         code = format!("{}{}\n", code, line);
     }
 

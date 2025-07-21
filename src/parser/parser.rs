@@ -25,6 +25,9 @@ pub enum Type {
     Float,
     String,
     Bool,
+    Char,
+    Long,
+    Short,
     Void,
 }
 
@@ -92,7 +95,7 @@ impl Parser {
         match tok.get_type() {
             TokenType::ID => {
                 if self.tokens_clone.get(self.pos + 1).map(|t| t.get_type())
-                    == Some(TokenType::COLON)
+                    == Some(TokenType::Colon)
                 {
                     self.declaration()
                 } else if self.tokens_clone.get(self.pos + 1).map(|t| t.get_type())
@@ -152,12 +155,16 @@ impl Parser {
     fn declaration(&mut self) -> Node {
         let name = self.current().get_value();
         self.eat(TokenType::ID);
-        self.eat(TokenType::COLON);
+        self.eat(TokenType::Colon);
 
         let t = match self.current().get_type() {
             TokenType::IntType => Type::Int,
             TokenType::StringType => Type::String,
             TokenType::BoolType => Type::Bool,
+            TokenType::CharType => Type::Char,
+            TokenType::LongType => Type::Long,
+            TokenType::ShortType => Type::Short,
+            TokenType::FloatType => Type::Float,
             _ => panic!("Unexpected type"),
         };
 
@@ -192,7 +199,7 @@ impl Parser {
             };
 
             //if !extype {
-                //panic!("Type not need {:?}, got {:?}", t, expr);
+            //panic!("Type not need {:?}, got {:?}", t, expr);
             //}
 
             return Node::Assignment(assignmentNode::new(variableNode::new(name, t), expr));
@@ -232,7 +239,7 @@ impl Parser {
             if self.current().get_type() == TokenType::ID {
                 let arg_name = self.current().get_value();
                 self.eat(TokenType::ID);
-                self.eat(TokenType::COLON);
+                self.eat(TokenType::Colon);
 
                 let arg_type = match self.current().get_type() {
                     TokenType::IntType => {
@@ -276,7 +283,7 @@ impl Parser {
                 .insert(arg.name.clone(), arg.arg_type.clone());
         }
 
-        self.eat(TokenType::COLON);
+        self.eat(TokenType::Colon);
 
         //обработка возращаемого значения
         let return_val = match self.current().get_type() {
@@ -362,13 +369,40 @@ impl Parser {
         let tok = self.current().clone();
         match tok.get_type() {
             TokenType::IntLiteral => {
+                let value_str = tok.get_value();
+                let value: i128 = value_str.parse().expect("not number");
+
                 self.eat(TokenType::IntLiteral);
-                let value = tok.get_value().parse::<i32>().unwrap();
-                expressionNode::Number(numberNode::new(value))
+
+                if value > 3600 {
+                    expressionNode::LongExpression(value)
+                } else {
+                    expressionNode::Number(numberNode::new(value as i32))
+                }
+            }
+            TokenType::FloatLiteral => {
+                //not work
+                //let value = self.current().get_value();
+                //let float_value = value.parse::<f32>().unwrap();
+                expressionNode::FloatExpression((0.0))
             }
             TokenType::StringLiteral => {
                 self.eat(TokenType::StringLiteral);
                 expressionNode::StringLiteral(tok.get_value())
+            }
+            TokenType::CharLiteral => {
+                self.eat(TokenType::CharLiteral);
+                let val = tok.get_value();
+                let ch = val.chars().next().expect("Empty char literal");
+                expressionNode::CharLiteral(ch)
+            }
+            TokenType::True => {
+                self.eat(TokenType::True);
+                expressionNode::Bool((true))
+            }
+            TokenType::False => {
+                self.eat(TokenType::False);
+                expressionNode::Bool((false))
             }
             TokenType::ID => {
                 let name = self.current().get_value();

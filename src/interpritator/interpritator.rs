@@ -101,11 +101,17 @@ impl Interpritator {
                 Type::String => Object::String(String::new()),
                 Type::Bool => Object::Bool(false),
                 Type::Float => Object::Float(0.0),
+                Type::Char => Object::Char(('\0')),
+                Type::Long => Object::Long((0)),
+                Type::Short => Object::Short((0)),
                 Type::Void => Object::Void,
             },
             expressionNode::Number(num_node) => Object::Int((num_node.get_value())),
-
+            expressionNode::LongExpression(long_num) => Object::Long((long_num)),
+            expressionNode::FloatExpression(f_num) => Object::Float((f_num)),
+            expressionNode::CharLiteral(char_node) => Object::Char((char_node)),
             expressionNode::StringLiteral(str_node) => Object::String((str_node)),
+            expressionNode::Bool(bool_node) => Object::Bool((bool_node)),
             expressionNode::Variable(var_node) => {
                 let name = var_node.get_name();
                 self.variables
@@ -152,19 +158,17 @@ impl Interpritator {
                     }
                     systemFunctions::println(args_for_println);
                     return Object::Void;
-                }
-
-                if name == "print" {
+                } else if name == "print" {
                     let mut args_for_println: Vec<Object> = Vec::new();
                     for arg in call.get_arguments() {
                         args_for_println.push(self.eval_expr(arg));
                     }
                     systemFunctions::print(args_for_println);
                     return Object::Void;
-                }
-
-                if name == "scan" {
+                } else if name == "scan" {
                     return systemFunctions::scan();
+                } else if name == "quit" {
+                    systemFunctions::quit();
                 }
 
                 let args = call.get_arguments();
@@ -245,6 +249,30 @@ impl Interpritator {
                                     let name = f_args[i].name.clone();
 
                                     match var.get_type() {
+                                        Type::Short => {
+                                            scope.add_variable(
+                                                name,
+                                                Object::Short(
+                                                    value.as_short().expect("need Int value"),
+                                                ),
+                                            );
+                                        }
+                                        Type::Long => {
+                                            scope.add_variable(
+                                                name,
+                                                Object::Long(
+                                                    value.as_long().expect("need Int value"),
+                                                ),
+                                            );
+                                        }
+                                        Type::Char => {
+                                            scope.add_variable(
+                                                name,
+                                                Object::Char(
+                                                    value.as_char().expect("need Int value"),
+                                                ),
+                                            );
+                                        }
                                         Type::Int => {
                                             scope.add_variable(
                                                 name,

@@ -1,4 +1,4 @@
-use crate::lexer::token::{self, Token};
+use crate::lexer::token::Token;
 use crate::lexer::token_type::*;
 
 pub struct Lexer {
@@ -25,13 +25,30 @@ impl Lexer {
 
     fn number_nize(&mut self) -> Token {
         let mut res = String::new();
+        let mut tok_type = TokenType::IntLiteral;
+        let mut dot_seen = false;
 
-        while self.pos < self.line_clone.len() && self.current.is_ascii_digit() {
-            res.push(self.current);
+        while self.pos < self.line_clone.len() {
+            if self.current.is_ascii_digit() {
+                res.push(self.current);
+            } else if self.current == '.' && !dot_seen {
+                dot_seen = true;
+                tok_type = TokenType::FloatLiteral;
+                res.push(self.current);
+            } else {
+                break;
+            }
             self.advance();
         }
 
-        Token::new(res, TokenType::IntLiteral)
+        if tok_type == TokenType::FloatLiteral {
+            let parts: Vec<&str> = res.split('.').collect();
+            if parts.len() != 2 || parts[0].is_empty() || parts[1].is_empty() {
+                panic!("Invalid float literal: '{}'", res);
+            }
+        }
+
+        Token::new(res, tok_type)
     }
 
     fn callinger_nize(&mut self) -> Token {
@@ -54,6 +71,10 @@ impl Lexer {
             "string" => Token::new(res, TokenType::StringType),
             "int" => Token::new(res, TokenType::IntType),
             "bool" => Token::new(res, TokenType::BoolType),
+            "short" => Token::new(res, TokenType::ShortType),
+            "char" => Token::new(res, TokenType::CharType),
+            "float" => Token::new(res, TokenType::FloatType),
+            "long" => Token::new(res, TokenType::LongType),
             "void" => Token::new(res, TokenType::VoidType),
             "return" => Token::new(res, TokenType::Return),
             _ => Token::new(res, TokenType::ID),
@@ -62,22 +83,59 @@ impl Lexer {
 
     fn string_nize(&mut self) -> Token {
         let quote_char = self.current;
-        self.advance();
 
-        let mut res = String::new();
-
-        while self.pos < self.line_clone.len() && self.current != quote_char {
-            res.push(self.current);
+        if quote_char == '\'' {
             self.advance();
+
+            if self.current == '\\' {
+                self.advance();
+                let esc = self.current;
+                self.advance();
+
+                if self.current != '\'' {
+                    panic!("Unterminated char literal");
+                }
+                self.advance();
+
+                let escaped_char = match esc {
+                    'n' => '\n',
+                    't' => '\t',
+                    'r' => '\r',
+                    '\\' => '\\',
+                    '\'' => '\'',
+                    _ => panic!("Unknown escape sequence"),
+                };
+
+                Token::new(escaped_char.to_string(), TokenType::CharLiteral)
+            } else {
+                let res = self.current;
+                self.advance();
+
+                if self.current != '\'' {
+                    panic!("Char literal ");
+                }
+
+                self.advance();
+                Token::new(res.to_string(), TokenType::CharLiteral)
+            }
+        } else {
+            self.advance();
+
+            let mut res = String::new();
+
+            while self.pos < self.line_clone.len() && self.current != quote_char {
+                res.push(self.current);
+                self.advance();
+            }
+
+            if self.current != quote_char {
+                panic!("Unterminated string literal");
+            }
+
+            self.advance();
+
+            Token::new(res, TokenType::StringLiteral)
         }
-
-        if self.current != quote_char {
-            panic!("Unterminated string literal");
-        }
-
-        self.advance();
-
-        Token::new(res, TokenType::StringLiteral)
     }
 
     pub fn token_nize(&mut self, line: String) -> Vec<Token> {
@@ -103,8 +161,8 @@ impl Lexer {
                 ')' => tokens.push(Token::new(")".to_string(), TokenType::RParen)),
                 '{' => tokens.push(Token::new("{".to_string(), TokenType::LBracket)),
                 '}' => tokens.push(Token::new("}".to_string(), TokenType::RBracket)),
-                ';' => tokens.push(Token::new(";".to_string(), TokenType::SEMICOLON)),
-                ':' => tokens.push(Token::new(":".to_string(), TokenType::COLON)),
+                ';' => tokens.push(Token::new(";".to_string(), TokenType::SemiColon)),
+                ':' => tokens.push(Token::new(":".to_string(), TokenType::Colon)),
                 ',' => tokens.push(Token::new(",".to_string(), TokenType::Coma)),
 
                 '"' | '\'' => {
@@ -134,8 +192,8 @@ impl Lexer {
             self.advance();
         }
 
-        //for tok in &mut tokens{
-        //    println!("{}",tok.get_name_of_token());
+        //for tok in &mut tokens {
+        //  println!("{}", tok.get_name_of_token());
         //}
 
         tokens

@@ -7,6 +7,8 @@ pub enum TokenType {
 
     IntLiteral,
     StringLiteral,
+    CharLiteral,
+    FloatLiteral,
 
     //lang words
     Fn,
@@ -24,6 +26,9 @@ pub enum TokenType {
     FloatType,
     BoolType,
     VoidType,
+    CharType,
+    ShortType,
+    LongType,
 
     True,
     False,
@@ -32,7 +37,7 @@ pub enum TokenType {
     RBracket,
 
     Assignment,
-    COLON,
-    SEMICOLON,
+    Colon,
+    SemiColon,
     Coma,
 }
