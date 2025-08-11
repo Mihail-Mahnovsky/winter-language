@@ -180,21 +180,31 @@ impl Parser {
                 expressionNode::StringLiteral(_) => t == Type::String,
                 expressionNode::DefaultValue(_) => true,
                 expressionNode::Variable(var) => var.get_type() == t,
-                expressionNode::BinOp(op) => {
-                    let left = op.get_left();
-                    let right = op.get_right();
-
-                    match (left, right) {
-                        (expressionNode::Number(_), expressionNode::Number(_)) => t == Type::Int,
-                        (expressionNode::StringLiteral(_), expressionNode::StringLiteral(_)) => {
-                            t == Type::String
+                
+                expressionNode::BinOp(_) => {
+                    fn is_binop_type_correct(expr: &expressionNode, expected: &Type) -> bool {
+                        match expr {
+                            expressionNode::BinOp(op) => {
+                                is_binop_type_correct(&op.get_left(), expected)
+                                    && is_binop_type_correct(&op.get_right(), expected)
+                            }
+                            expressionNode::Number(_) => expected == &Type::Int,
+                            expressionNode::StringLiteral(_) => expected == &Type::String,
+                            expressionNode::Bool(_) => expected == &Type::Bool,
+                            expressionNode::CharLiteral(_) => expected == &Type::Char,
+                            expressionNode::FloatExpression(_) => expected == &Type::Float,
+                            expressionNode::LongExpression(_) => expected == &Type::Long,
+                            expressionNode::Variable(var) => &var.get_type() == expected,
+                            _ => false,
                         }
-                        (expressionNode::StringLiteral(_), expressionNode::Number(_)) => {
-                            t == Type::String
-                        }
-                        _ => panic!("undexpected type"),
                     }
+
+                    if !is_binop_type_correct(&expr, &t) {
+                        panic!("Type mismatch in binop for variable '{}'", name);
+                    }
+                    true
                 }
+
                 _ => false,
             };
 
