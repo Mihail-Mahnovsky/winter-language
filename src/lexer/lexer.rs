@@ -151,9 +151,10 @@ impl Lexer {
 
         while self.pos < self.line_clone.len() {
             match self.current {
-                '#' => continue,
+                '#' => {self.advance(); continue},
+                '>' => {self.advance(); continue},
                 '+' => tokens.push(Token::new("+".to_string(), TokenType::Operator)),
-                '-' => tokens.push(Token::new("-".to_string(), TokenType::Operator)),
+                '-' =>  if self.line_clone[self.pos + 1] == '>' { tokens.push(Token::new("->".to_string(), TokenType::RetOp)); self.advance() } else { tokens.push(Token::new("-".to_string(), TokenType::Operator))},
                 '*' => tokens.push(Token::new("*".to_string(), TokenType::Operator)),
                 '/' => tokens.push(Token::new("/".to_string(), TokenType::Operator)),
                 '=' => tokens.push(Token::new("=".to_string(), TokenType::Assignment)),

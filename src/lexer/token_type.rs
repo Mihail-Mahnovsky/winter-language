@@ -36,6 +36,8 @@ pub enum TokenType {
     LBracket,
     RBracket,
 
+
+    RetOp,
     Assignment,
     Colon,
     SemiColon,

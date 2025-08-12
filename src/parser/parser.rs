@@ -293,7 +293,7 @@ impl Parser {
                 .insert(arg.name.clone(), arg.arg_type.clone());
         }
 
-        self.eat(TokenType::Colon);
+        self.eat(TokenType::RetOp);
 
         //обработка возращаемого значения
         let return_val = match self.current().get_type() {
